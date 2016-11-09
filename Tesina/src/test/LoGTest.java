@@ -1,3 +1,6 @@
+/*
+ * ZThis is a documentation test for github
+ */
 package test;
 
 import java.awt.BorderLayout;
