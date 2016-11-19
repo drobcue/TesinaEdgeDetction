@@ -19,6 +19,7 @@ import javax.swing.GrayFilter;
 public class Prewitt {
 	private BufferedImage image = null;
 	private int nrows=0, ncols=0; 
+	private double elapseTime = 0;
 	public Prewitt(String imgPath){
 		try{
 			//Read Image
@@ -42,6 +43,10 @@ public class Prewitt {
 			e.printStackTrace();
 		}
 			
+	}
+	
+	public double getElapseTime(){
+		return this.elapseTime;
 	}
 	
 	public BufferedImage getPrewitt(String option) throws Exception{
@@ -104,34 +109,9 @@ public class Prewitt {
 			}
 		}
 		stopTime=System.currentTimeMillis();
+		this.elapseTime = stopTime - startTime;
 		
-		//System.out.println("Prewitt execution time = " + (stopTime - startTime)/1000 + "." + (stopTime - startTime)%1000 +" seconds");
-		//System.out.println("Prewitt execution time = " + (stopTime - startTime) + " miliseconds");
-	
-//		int[][] gSelected = null;
-//		if(option.toUpperCase()=="FULL"){
-//			gSelected = G;
-//		}
-//		else if(option.toUpperCase()=="X"){
-//			gSelected = Gx;
-//		}
-//		else if(option.toUpperCase()=="Y"){
-//			gSelected = Gy;
-//		}
-//		
-//		i = 0;
-//		for(int row = 0; row < imgArray2D.length; row++){
-//			for(int column = 0; column < imgArray2D[row].length; column++){
-//				//System.out.println(G[row][column]);
-//				imgArray1D[i++] = gSelected[row][column];
-//			}
-//		}
-//		
-//		BufferedImage tmpImage = new BufferedImage(ncols, nrows, BufferedImage.TYPE_BYTE_GRAY);
-//		
-//        WritableRaster raster = (WritableRaster) tmpImage.getData();
-//        raster.setPixels(0,0,ncols,nrows,imgArray1D);
-//        tmpImage.setData(raster);
+
 		return tmpImage;		
 	}
 	

@@ -186,7 +186,7 @@ public class Sobel {
 		this.elapseTime = ((double)stopTime - startTime)/1000;
 		
 		//System.out.println("Sobel execution time = " + (stopTime - startTime)/1000 + "." + (stopTime - startTime)%1000 +" seconds");
-		System.out.println("Sobel execution time = " + (stopTime - startTime)/1000 + " miliseconds");
+		System.out.println("Sobel execution time = " + ((double)stopTime - startTime)/1000 + " miliseconds");
 	
 //		int[][] gSelected = null;
 //		if(option.toUpperCase()=="FULL"){

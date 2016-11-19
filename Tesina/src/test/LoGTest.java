@@ -33,12 +33,14 @@ import javax.swing.event.ChangeListener;
 import javax.swing.JProgressBar;
 
 import filters.Luplacian;
+import filters.Prewitt;
 import filters.Sobel;
 
 import javax.swing.JCheckBox;
 import javax.swing.JTextPane;
 
 import post.PostProcess;
+
 import javax.swing.JComboBox;
 import javax.swing.DefaultComboBoxModel;
 
@@ -252,7 +254,7 @@ public class LoGTest extends JFrame {
 		inputOptionsPane.add(cmbImage);
 		
 		cmbFilter = new JComboBox();
-		cmbFilter.setModel(new DefaultComboBoxModel(new String[] {"Laplacian", "Sobel"}));
+		cmbFilter.setModel(new DefaultComboBoxModel(new String[] {"Laplacian", "Sobel", "Prewitt"}));
 		cmbFilter.addActionListener(aList);
 		cmbFilter.setActionCommand("Filter");
 		sl_inputOptionsPane.putConstraint(SpringLayout.NORTH, cmbFilter, 0, SpringLayout.NORTH, lblFilter);
@@ -331,44 +333,45 @@ public class LoGTest extends JFrame {
 
 		private BufferedImage getBImg(ActionEvent e) throws Exception {
 			Map<String, Double> errorPer = new HashMap<String, Double>();
-			String imgPath = cmbImage.getSelectedItem().toString();
+			String imgPath = cmbImage.getSelectedItem().toString(),
+					msg = null;
 			int kernelSize = sldrKernelSize.getValue();
+			double elapseTime = 0;
+			BufferedImage tmpImg = null;
 			if (cmbFilter.getSelectedItem().toString().equals("Laplacian")){
 				Luplacian lap = new Luplacian(imgPath);				
 				double value;
 				JSlider slider = ((JSlider)((JButton)e.getSource()).getParent().getComponent(1));
 				value = slider.getValue();
 				value = value / 100;
-				BufferedImage tmpImg = lap.getLuplacian3("NEGATIVE", value, kernelSize);
-				String msg = "Filter : Sobel\n";
-				msg += "Run Time : " + ((Sobel)imgAlg).getElapsedTime() + " seconds\n";
-				
-				if (((JCheckBox)((JButton)e.getSource()).getParent().getComponent(6)).isSelected()){
-					PostProcess.markError("Shapes Test Original.png", tmpImg, errorPer);
-					msg += "Undetected edges % : " + 
-							String.format("%1$.2f", errorPer.get("UNDETECTED"))+ "%\n";
-					msg += "False positives edges % : " + String.format("%1$.2f", errorPer.get("FALSE")) + "%";
-				}
-				textPane.setText(msg);
-				return tmpImg;
+				tmpImg = lap.getLuplacian3("NEGATIVE", value, kernelSize);
+				elapseTime = lap.getElapseTime();
+				msg = "Filter : Laplacian Of Gaussian\n";
 			}
 			else if (cmbFilter.getSelectedItem().toString().equals("Sobel")){
 				Sobel sobel = new Sobel(imgPath);
-				BufferedImage tmpImg = sobel.getSobel2("FULL");
-				String msg = "Filter : Sobel\n";
-				msg += "Run Time : " + ((Sobel)imgAlg).getElapsedTime() + " seconds\n";
-				
-				if (((JCheckBox)((JButton)e.getSource()).getParent().getComponent(6)).isSelected()){
-					PostProcess.markError("Shapes Test Original.png", tmpImg, errorPer);
-					msg += "Undetected edges % : " + 
-							String.format("%1$.2f", errorPer.get("UNDETECTED"))+ "%\n";
-					msg += "False positives edges % : " + String.format("%1$.2f", errorPer.get("FALSE")) + "%";
-				}
-				textPane.setText(msg);
-				return tmpImg;
+				tmpImg = sobel.getSobel2("FULL");
+				elapseTime = sobel.getElapsedTime();
+				msg = "Filter : Sobel\n";
+			}
+			else if(cmbFilter.getSelectedItem().toString().equals("Prewitt")){
+				Prewitt prewitt = new Prewitt(imgPath);
+				tmpImg = prewitt.getPrewitt("FULL");
+				elapseTime = prewitt.getElapseTime();
+				msg = "Filter : Prewitt\n";
 			}
 				
-			return null;
+			
+			msg += "Run Time : " + String.format("%1$.3f", elapseTime) + " seconds\n";
+			
+			if (((JCheckBox)((JButton)e.getSource()).getParent().getComponent(6)).isSelected()){
+				PostProcess.markError("Shapes Test Original.png", tmpImg, errorPer);
+				msg += "Undetected edges % : " + 
+						String.format("%1$.2f", errorPer.get("UNDETECTED"))+ "%\n";
+				msg += "False positives edges % : " + String.format("%1$.2f", errorPer.get("FALSE")) + "%";
+			}
+			textPane.setText(msg);
+			return tmpImg;
 		}
 		
 	}

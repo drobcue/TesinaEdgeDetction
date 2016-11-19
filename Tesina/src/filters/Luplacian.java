@@ -19,6 +19,7 @@ import javax.swing.GrayFilter;
 public class Luplacian {
 	private BufferedImage image = null;
 	private int nrows=0, ncols=0;
+	private double elapseTime = 0;
 	public Luplacian(String imgPath){
 		try{
 			//Read Image
@@ -41,6 +42,10 @@ public class Luplacian {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+	}
+	
+	public double getElapseTime(){
+		return this.elapseTime;
 	}
 	
 	private int[][] getKernel(int size, double theta){
@@ -304,6 +309,7 @@ public class Luplacian {
 				}
 			}
 			stopTime=System.currentTimeMillis();
+			this.elapseTime = stopTime - startTime;
 		}		
 		
 		System.out.println("Laplacian execution time = " + (stopTime - startTime)/1000 + "." + (stopTime - startTime)%1000 +" seconds");
