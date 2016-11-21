@@ -49,31 +49,31 @@ public class Prewitt {
 		return this.elapseTime;
 	}
 	
-	public BufferedImage getPrewitt(String option) throws Exception{
-		long startTime, stopTime;
-		
+	/**
+	 * 
+	 * @param option This is the option to filter. Accepted Values:
+	 * <br>FULL<br/>HORIZONTAL<br>VERTICAL
+	 * @return A BufferedImage representation of the border.
+	 * @throws Exception if the option value is not define.
+	 */
+	public BufferedImage getPrewitt(String option) throws Exception{		
 		if(option.toUpperCase()!="FULL" && option.toUpperCase()!="X" && option.toUpperCase()!="Y")
 			throw new Exception();
-		int[] imgArray1D = new int[ncols * nrows];
+		long startTime, stopTime;
 		int[][] Gx = new int[nrows][ncols],
 				Gy = new int[nrows][ncols],
 			    G = new int[nrows][ncols],
-			    imgArray2D = new int[nrows][ncols];
-		
+			    imgArray2D = new int[nrows][ncols];		
 		BufferedImage tmpImage = new BufferedImage(ncols, nrows, BufferedImage.TYPE_INT_RGB);
 	
-		Color tmpColor;
-	    
+		Color tmpColor;	    
 		int i = 0;
 		for(int row = 0; row < nrows; row++){
 			for(int column = 0; column < ncols; column++){
 				tmpColor = new Color(image.getRGB(column, row));
-				//System.out.println(imgArray1D[i]);
 				imgArray2D[row][column] = tmpColor.getRed();
 			}
-		}
-	    
-		
+		}		
 		
 		startTime=System.currentTimeMillis();
 		for(i=0; i<nrows; i++){
@@ -110,19 +110,21 @@ public class Prewitt {
 		}
 		stopTime=System.currentTimeMillis();
 		this.elapseTime = stopTime - startTime;
-		
 
 		return tmpImage;		
 	}
 	
-	public BufferedImage getPrewitt(int width, int height, String option){		
-		try {
-			return getScaled(new Dimension(width, height), getPrewitt(option));
-		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		return null;
+	/**
+	 * 
+	 * @param width The width value for the image to be return.
+	 * @param height The height value for the image to be return.
+	 * @param option This is the option to filter. Accepted Values:
+	 * <br>FULL<br/>HORIZONTAL<br>VERTICAL
+	 * @return A scaled BufferedImage representation of the border.
+	 * @throws Exception Exception if the option value is not define.
+	 */
+	public BufferedImage getPrewitt(int width, int height, String option) throws Exception{		
+		return getScaled(new Dimension(width, height), getPrewitt(option));		
 	}
 	
 	private BufferedImage getScaled(Dimension d, BufferedImage img){

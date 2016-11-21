@@ -357,6 +357,7 @@ public class LoGTest extends JFrame {
 			else if(cmbFilter.getSelectedItem().toString().equals("Prewitt")){
 				Prewitt prewitt = new Prewitt(imgPath);
 				tmpImg = prewitt.getPrewitt("FULL");
+				
 				elapseTime = prewitt.getElapseTime();
 				msg = "Filter : Prewitt\n";
 			}
