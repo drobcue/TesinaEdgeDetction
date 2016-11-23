@@ -19,6 +19,7 @@ import javax.swing.GrayFilter;
 public class Roberts {
 	private BufferedImage image = null;
 	private int nrows=0, ncols=0; 
+	private double elapseTime;
 	
 	public Roberts(String imgPath){
 		try{
@@ -45,21 +46,19 @@ public class Roberts {
 			
 	}
 	
+	public double getElapseTime(){
+		return this.elapseTime;
+	}
+	
 	public BufferedImage getRoberts(String option) throws Exception{
-		long startTime, stopTime;
-		
-		
 		if(option.toUpperCase()!="FULL" && option.toUpperCase()!="X" && option.toUpperCase()!="Y")
 			throw new Exception();
-		int[] imgArray1D = new int[ncols * nrows];
+		
+		long startTime, stopTime;
 		int[][] Gx = new int[nrows][ncols],
 				Gy = new int[nrows][ncols],
 			    G = new int[nrows][ncols],
-			    imgArray2D = new int[nrows][ncols];
-		
-		
-	
-		
+			    imgArray2D = new int[nrows][ncols];		
 		BufferedImage tmpImage = new BufferedImage(ncols, nrows, BufferedImage.TYPE_INT_RGB);
 		
 		Color tmpColor;
@@ -68,11 +67,9 @@ public class Roberts {
 		for(int row = 0; row < nrows; row++){
 			for(int column = 0; column < ncols; column++){
 				tmpColor = new Color(image.getRGB(column, row));
-				//System.out.println(imgArray1D[i]);
 				imgArray2D[row][column] = tmpColor.getRed();
 			}
-		}
-		
+		}		
 		
 		startTime=System.currentTimeMillis();
 		for(i=0; i<nrows; i++){
@@ -103,34 +100,9 @@ public class Roberts {
 			}
 		}
 		stopTime=System.currentTimeMillis();
+		this.elapseTime = stopTime - startTime;
 		
-		//System.out.println("Roberts execution time = " + (stopTime - startTime)/1000 + "." + (stopTime - startTime)%1000 +" seconds");
-		//System.out.println("Roberts execution time = " + (stopTime - startTime) + " miliseconds");
 	
-//		int[][] gSelected = null;
-//		if(option.toUpperCase()=="FULL"){
-//			gSelected = G;
-//		}
-//		else if(option.toUpperCase()=="X"){
-//			gSelected = Gx;
-//		}
-//		else if(option.toUpperCase()=="Y"){
-//			gSelected = Gy;
-//		}
-//		
-//		i = 0;
-//		for(int row = 0; row < imgArray2D.length; row++){
-//			for(int column = 0; column < imgArray2D[row].length; column++){
-//				//System.out.println(G[row][column]);
-//				imgArray1D[i++] = gSelected[row][column];
-//			}
-//		}
-//		
-//		BufferedImage tmpImage = new BufferedImage(ncols, nrows, BufferedImage.TYPE_BYTE_GRAY);
-//		
-//        WritableRaster raster = (WritableRaster) tmpImage.getData();
-//        raster.setPixels(0,0,ncols,nrows,imgArray1D);
-//        tmpImage.setData(raster);
 		return tmpImage;		
 	}
 	
