@@ -5,6 +5,7 @@ package test;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.Cursor;
 import java.awt.EventQueue;
 
 import javax.swing.Icon;
@@ -34,6 +35,7 @@ import javax.swing.JProgressBar;
 
 import filters.Luplacian;
 import filters.Prewitt;
+import filters.Roberts;
 import filters.Sobel;
 
 import javax.swing.JCheckBox;
@@ -53,9 +55,12 @@ public class LoGTest extends JFrame {
 	private JComboBox cmbImage,
 	                  cmbFilter;
 	private ActionListener aList = new DoEdge();
-	private JCheckBox chckbxMarkDiference;
+	private JCheckBox chckbxMarkDiference,
+					  chkBoxDoThreshold;
 	private JSlider sldrVarience,
-					sldrKernelSize;
+					sldrKernelSize,
+					sldrThreshold;
+	
 	
 
 	/**
@@ -150,7 +155,7 @@ public class LoGTest extends JFrame {
 //		scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
 		
 		JPanel panelOptions = new JPanel();
-		sl_contentPanel.putConstraint(SpringLayout.NORTH, panelOptions, -300, SpringLayout.SOUTH, contentPanel);
+		sl_contentPanel.putConstraint(SpringLayout.NORTH, panelOptions, -400, SpringLayout.SOUTH, contentPanel);
 		sl_contentPanel.putConstraint(SpringLayout.WEST, panelOptions, 5, SpringLayout.EAST, imagePanel);
 		sl_contentPanel.putConstraint(SpringLayout.SOUTH, panelOptions, -5, SpringLayout.SOUTH, contentPanel);
 		
@@ -212,11 +217,39 @@ public class LoGTest extends JFrame {
 		chckbxMarkDiference = new JCheckBox("Mark Diference");
 		sl_panelOptions.putConstraint(SpringLayout.NORTH, chckbxMarkDiference, 25, SpringLayout.SOUTH, sldrVarience);
 		sl_panelOptions.putConstraint(SpringLayout.WEST, chckbxMarkDiference, 5, SpringLayout.WEST, panelOptions);
-		panelOptions.add(chckbxMarkDiference,6);
+		panelOptions.add(chckbxMarkDiference);
 		
 		JPanel infoPanel = new JPanel();
 		sl_contentPanel.putConstraint(SpringLayout.WEST, infoPanel, 5, SpringLayout.EAST, imagePanel);
 		sl_contentPanel.putConstraint(SpringLayout.SOUTH, infoPanel, -5, SpringLayout.NORTH, panelOptions);
+		
+		chkBoxDoThreshold = new JCheckBox("Do Threshold");
+		sl_panelOptions.putConstraint(SpringLayout.NORTH, chkBoxDoThreshold, 5, SpringLayout.SOUTH, chckbxMarkDiference);
+		sl_panelOptions.putConstraint(SpringLayout.WEST, chkBoxDoThreshold, 5, SpringLayout.WEST, panelOptions);
+		panelOptions.add(chkBoxDoThreshold);
+		
+		JLabel lblThreshold = new JLabel("Threshold");
+		sl_panelOptions.putConstraint(SpringLayout.NORTH, lblThreshold, 5, SpringLayout.SOUTH, chkBoxDoThreshold);
+		sl_panelOptions.putConstraint(SpringLayout.WEST, lblThreshold, 5, SpringLayout.WEST, panelOptions);
+		panelOptions.add(lblThreshold);
+		
+		JLabel label = new JLabel("0");
+		sl_panelOptions.putConstraint(SpringLayout.NORTH, label, 5, SpringLayout.SOUTH, chkBoxDoThreshold);
+		sl_panelOptions.putConstraint(SpringLayout.WEST, label, 5, SpringLayout.EAST, lblThreshold);
+		panelOptions.add(label);
+		
+		sldrThreshold = new JSlider();
+		sldrThreshold.setBorder(new BevelBorder(BevelBorder.LOWERED, null, null, null, null));
+		sldrThreshold.setMajorTickSpacing(50);
+		sldrThreshold.setPaintLabels(true);
+		sldrThreshold.setPaintTicks(true);
+		sldrThreshold.setMaximum(255);
+		sldrThreshold.setValue(0);
+		sldrThreshold.addChangeListener(new ThresholdChange());
+		sl_panelOptions.putConstraint(SpringLayout.NORTH, sldrThreshold, 5, SpringLayout.SOUTH, lblThreshold);
+		sl_panelOptions.putConstraint(SpringLayout.WEST, sldrThreshold, 5, SpringLayout.WEST, panelOptions);
+		panelOptions.add(sldrThreshold);
+		
 		sl_contentPanel.putConstraint(SpringLayout.EAST, infoPanel, -5, SpringLayout.EAST, contentPanel);
 		contentPanel.add(infoPanel);
 		infoPanel.setLayout(new BorderLayout(0, 0));
@@ -245,8 +278,9 @@ public class LoGTest extends JFrame {
 		sl_inputOptionsPane.putConstraint(SpringLayout.WEST, lblFilter, 0, SpringLayout.WEST, lblImage);
 		inputOptionsPane.add(lblFilter);
 		
+		//Set Image Path
 		cmbImage = new JComboBox();
-		cmbImage.setModel(new DefaultComboBoxModel(new String[] {"Shapes Test.png", "FOTO.jpg", "Test.png", "3D-shapes.png"}));
+		cmbImage.setModel(new DefaultComboBoxModel(new String[] {"Shapes Test.png", "FOTO.jpg", "Test.png", "3D-shapes.png", "Diagonal Edges.png", "Horizontal Edges.png", "Vertical Edges.png", "Light Test.png"}));
 		cmbImage.addActionListener(aList);
 		cmbImage.setActionCommand("Image");
 		sl_inputOptionsPane.putConstraint(SpringLayout.NORTH, cmbImage, 0, SpringLayout.NORTH, lblImage);
@@ -254,7 +288,7 @@ public class LoGTest extends JFrame {
 		inputOptionsPane.add(cmbImage);
 		
 		cmbFilter = new JComboBox();
-		cmbFilter.setModel(new DefaultComboBoxModel(new String[] {"Laplacian", "Sobel", "Prewitt"}));
+		cmbFilter.setModel(new DefaultComboBoxModel(new String[] {"Laplacian", "Sobel", "Prewitt", "Roberts"}));
 		cmbFilter.addActionListener(aList);
 		cmbFilter.setActionCommand("Filter");
 		sl_inputOptionsPane.putConstraint(SpringLayout.NORTH, cmbFilter, 0, SpringLayout.NORTH, lblFilter);
@@ -295,13 +329,29 @@ public class LoGTest extends JFrame {
 		
 	}
 	
+	private class ThresholdChange implements ChangeListener{
+
+		public void stateChanged(ChangeEvent e) {
+			int value;
+			JSlider slider = (JSlider) e.getSource();
+			JLabel lblThreshold = (JLabel)slider.getParent().getComponent(9);
+			value = slider.getValue();
+			lblThreshold.setText(String.valueOf(value));
+			//lblVariance.repaint();
+			
+			
+		}
+		
+	}
+	
 	private class DoEdge implements ActionListener{
 
 		public void actionPerformed(ActionEvent e) {
-			System.out.println(e.getActionCommand());
+			
 			if(e.getActionCommand().equals("Image")){
 				String imgPath = cmbImage.getSelectedItem().toString();
-				if(imgPath.equals("Shapes Test.png")){
+				//Check if the image have a comparison image
+				if(imgPath.equals("Shapes Test.png") || imgPath.equals("Diagonal Edges.png" ) || imgPath.equals("Horizontal Edges.png") || imgPath.equals("Vertical Edges.png")){
 					chckbxMarkDiference.setEnabled(true);
 				}
 				else{
@@ -312,9 +362,11 @@ public class LoGTest extends JFrame {
 			else if(e.getActionCommand().equals("DoEdge")){
 				BufferedImage img = null;
 				try {
+					setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
 					img = getBImg(e);
 					lblLapImage.setIcon(new ImageIcon(img));
 					lblLapImage.repaint();
+					setCursor(null);
 				} catch (Exception e2) {
 					// TODO Auto-generated catch block
 					e2.printStackTrace();
@@ -361,17 +413,43 @@ public class LoGTest extends JFrame {
 				elapseTime = prewitt.getElapseTime();
 				msg = "Filter : Prewitt\n";
 			}
+			else if(cmbFilter.getSelectedItem().toString().equals("Roberts")){
+				Roberts rob = new Roberts(imgPath);
+				tmpImg = rob.getRoberts("FULL");
+				
+				elapseTime = rob.getElapseTime();
+				msg = "Filter : Roberts\n";
+			}
 				
 			
 			msg += "Run Time : " + String.format("%1$.3f", elapseTime) + " seconds\n";
 			
-			if (((JCheckBox)((JButton)e.getSource()).getParent().getComponent(6)).isSelected()){
-				PostProcess.markError("Shapes Test Original.png", tmpImg, errorPer);
+			if(chkBoxDoThreshold.isSelected())
+				PostProcess.doThreshold(tmpImg, sldrThreshold.getValue());
+			
+			if (chckbxMarkDiference.isSelected()){ // old (((JCheckBox)((JButton)e.getSource()).getParent().getComponent(6)).isSelected())
+				String origPath = null;
+				//Do the comparison of the image
+				if(imgPath.equals("Shapes Test.png")){
+					origPath = "Shapes Test Original.png";
+				}
+				else if (imgPath.equals("Diagonal Edges.png")){
+					origPath = "Diagonal Edges Original.png";
+				}
+				else if(imgPath.equals("Horizontal Edges.png")){
+					origPath = "Horizontal Edges Original.png";
+				}
+				else if(imgPath.equals("Vertical Edges.png")){
+					origPath = "Vertical Edges Original.png";
+				}
+				PostProcess.markError(origPath, tmpImg, errorPer);
 				msg += "Undetected edges % : " + 
 						String.format("%1$.2f", errorPer.get("UNDETECTED"))+ "%\n";
 				msg += "False positives edges % : " + String.format("%1$.2f", errorPer.get("FALSE")) + "%";
 			}
 			textPane.setText(msg);
+			
+			
 			return tmpImg;
 		}
 		
