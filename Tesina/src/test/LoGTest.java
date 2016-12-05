@@ -8,6 +8,7 @@ import java.awt.Color;
 import java.awt.Cursor;
 import java.awt.EventQueue;
 
+import javax.imageio.ImageIO;
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
@@ -23,6 +24,8 @@ import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -250,6 +253,13 @@ public class LoGTest extends JFrame {
 		sl_panelOptions.putConstraint(SpringLayout.WEST, sldrThreshold, 5, SpringLayout.WEST, panelOptions);
 		panelOptions.add(sldrThreshold);
 		
+		JButton btnSave = new JButton("Save");
+		sl_panelOptions.putConstraint(SpringLayout.WEST, btnSave, 0, SpringLayout.WEST, btnNewButton);
+		sl_panelOptions.putConstraint(SpringLayout.SOUTH, btnSave, -6, SpringLayout.NORTH, btnNewButton);
+		panelOptions.add(btnSave);
+		btnSave.addActionListener(aList);
+		btnSave.setActionCommand("SAVE");
+		
 		sl_contentPanel.putConstraint(SpringLayout.EAST, infoPanel, -5, SpringLayout.EAST, contentPanel);
 		contentPanel.add(infoPanel);
 		infoPanel.setLayout(new BorderLayout(0, 0));
@@ -280,7 +290,7 @@ public class LoGTest extends JFrame {
 		
 		//Set Image Path
 		cmbImage = new JComboBox();
-		cmbImage.setModel(new DefaultComboBoxModel(new String[] {"Shapes Test.png", "FOTO.jpg", "Test.png", "3D-shapes.png", "Diagonal Edges.png", "Horizontal Edges.png", "Vertical Edges.png", "Light Test.png"}));
+		cmbImage.setModel(new DefaultComboBoxModel(new String[] {"Shapes Test.png", "FOTO.jpg", "Test.png", "3D-shapes.png", "Diagonal Edges.png", "Horizontal Edges.png", "Vertical Edges.png", "Light Test.png", "ID Face.png", "Huella.jpg"}));
 		cmbImage.addActionListener(aList);
 		cmbImage.setActionCommand("Image");
 		sl_inputOptionsPane.putConstraint(SpringLayout.NORTH, cmbImage, 0, SpringLayout.NORTH, lblImage);
@@ -379,6 +389,18 @@ public class LoGTest extends JFrame {
 				else{
 					sldrVarience.setValue(0);
 					sldrVarience.setEnabled(false);
+				}
+			}
+			else if (e.getActionCommand().equals("SAVE")){
+				File outFile = new File("output.png");
+				try {
+					ImageIO.write(getBImg(e), "png", outFile);
+				} catch (IOException ex) {
+					// TODO Auto-generated catch block
+					ex.printStackTrace();
+				} catch (Exception ex) {
+					// TODO Auto-generated catch block
+					ex.printStackTrace();
 				}
 			}
 		}
